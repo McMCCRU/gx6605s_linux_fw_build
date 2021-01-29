@@ -1,0 +1,28 @@
+#!/bin/sh
+
+echo "Welcome to GX Linux!"
+
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t tmpfs mdev /dev
+mkdir -p /dev/pts
+mount -t devpts devpts /dev/pts
+mount -t tmpfs tmpfs /tmp
+mount -t tmpfs tmpfs /media
+mount -t tmpfs tmpfs /var
+mkdir -p /var/lock
+mkdir -p /var/run
+
+mknod /dev/console c 5 1
+mknod /dev/ptmx c 5 2
+
+insmod /lib/modules/2.6.27.55/kernel/fs/mbcache.ko
+insmod /lib/modules/2.6.27.55/kernel/fs/jbd/jbd.ko
+insmod /lib/modules/2.6.27.55/kernel/fs/ext3/ext3.ko
+
+echo "2" > /proc/cpu/alignment 2
+
+superd
+
+exec /sbin/init
+#exec /sbin/init </dev/console >/dev/console 2>/dev/console

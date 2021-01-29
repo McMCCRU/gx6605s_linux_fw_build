@@ -1,0 +1,56 @@
+#!/bin/sh
+
+if [ -f /home/gx/etc/config.conf ]; then
+. /home/gx/etc/config.conf
+fi
+
+case "$1" in
+    start)
+	if [ ! -c /dev/monitor0 ]; then
+		echo "Install  monitor driver..."
+		mknod /dev/monitor0 c 10 253
+		insmod /lib/modules/`uname -r`/monitor_memory.ko
+		demod_test
+		# for Combo
+		if [ -f /var/is_dvbs.lock ] &&  [ -f /var/is_dvbt.lock ] && [ ! -f /var/is_dvbc.lock ]; then
+			monitor -w 0x0030a13c -v 0xda8
+			monitor -w 0x00305000 -v 0xd88
+			if [ "$EN_ANT_PWR" = "on" ]; then
+				monitor -w 0x00305004 -v 0x5a8
+			else
+				monitor -w 0x00305004 -v 0xa0
+			fi
+		fi
+		if [ -f /var/is_dvbs.lock ] &&  [ -f /var/is_dvbc.lock ] && [ ! -f /var/is_dvbt.lock ]; then
+			monitor -w 0x0030a13c -v 0xda8
+			monitor -w 0x00305000 -v 0xd88
+			monitor -w 0x00305004 -v 0xa0
+		fi
+		# end for Combo
+		if [ -f /var/is_dvbt.lock ] &&  [ ! -f /var/is_dvbs.lock ] && [ ! -f /var/is_dvbc.lock ]; then
+			if [ "$EN_ANT_PWR" = "on" ]; then
+				monitor -w 0x0030a13c -v 0x5a0
+				monitor -w 0x00305000 -v 0x520
+			else
+				monitor -w 0x0030a13c -v 0x5a2
+				monitor -w 0x00305000 -v 0x522
+			fi
+		fi
+		if [ -f /var/is_dvbs.lock ] &&  [ ! -f /var/is_dvbt.lock ] && [ ! -f /var/is_dvbc.lock ]; then
+			monitor -w 0x0030a13c -v 0x5a0
+			monitor -w 0x00305000 -v 0x520
+		fi
+		if [ -f /var/is_dvbc.lock ] &&  [ ! -f /var/is_dvbt.lock ] && [ ! -f /var/is_dvbs.lock ]; then
+			monitor -w 0x0030a13c -v 0x5a2
+			monitor -w 0x00305000 -v 0x522
+		fi
+	fi
+	;;
+    stop)
+	;;
+    restart|reload)
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac

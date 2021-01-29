@@ -1,0 +1,31 @@
+#!/bin/sh
+
+FE_PROFILE=""
+
+if [ -f /home/gx/etc/config.conf ]; then
+. /home/gx/etc/config.conf
+fi
+
+if [ ! -n "$FE_PROFILE" ]; then
+        FE_PROFILE="|10:0:0x80:81:0:0xc0:&0:1:0:0:0:0"
+fi
+if [ -n "$FE_PROFILE" ]; then
+        FE_NUM=`echo -n $FE_PROFILE | sed "s/|/\n/g" | wc -l`
+fi
+
+case "$1" in
+    start)
+        if [ ! -c /dev/dvb0.frontend0 ]; then
+            echo "Install frontend driver..."
+            echo "FE nums: $FE_NUM"
+            insmod /lib/modules/`uname -r`/fe.ko num=$FE_NUM profile=$FE_PROFILE
+        fi
+        ;;
+    stop)
+        ;;
+    restart|reload)
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+		/bin/ntp.sh
+        ;;
+    stop)
+		super remove ntp 2> /dev/null
+        ;;
+    restart|reload)
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac

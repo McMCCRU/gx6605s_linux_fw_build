@@ -1,0 +1,9 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		echo "panel..."
+		mknod /dev/gxpanel0 c 22 0
+		insmod /lib/modules/`uname -r`/panel.ko
+	;;
+esac

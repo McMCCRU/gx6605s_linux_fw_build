@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# Start application ...
+#
+
+PASS_ADMIN=""
+TIMEZONE=""
+
+if [ -f /home/gx/etc/config.conf ]; then
+. /home/gx/etc/config.conf
+fi
+
+if [ ! -n "$TIMEZONE" ]; then
+        TIMEZONE="MSK-3"
+fi
+
+case "$1" in
+    start)
+        ifconfig lo 127.0.0.1 netmask 255.0.0.0 up 2> /dev/null
+
+        echo $TIMEZONE > /etc/TZ
+
+        if [ -n "$PASS_ADMIN" ]; then
+            WEB_LOGIN="admin:gx6605s"
+            WEB_PASS=`echo -n "$WEB_LOGIN:$PASS_ADMIN" | md5sum | cut -f1 -d " "`
+            echo "$WEB_LOGIN:$WEB_PASS" > /var/htpasswd
+            LIN_PASS=`mkpasswd $PASS_ADMIN`
+            echo "root:$LIN_PASS:0:0:root:/:/bin/sh" > /etc/passwd
+        else
+            echo "root::0:0:root:/:/bin/sh" > /etc/passwd
+        fi
+        super watch webifd webifd
+        ;;
+    stop)
+        ;;
+    restart|reload)
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac

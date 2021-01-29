@@ -1,0 +1,12 @@
+#!/bin/sh
+
+case "$1" in
+    start)
+        echo "S03sysctl..."
+        [ -f /etc/sysctl.conf ] && sysctl -p -e -q
+        ;;
+    *)
+        echo "Usage: $0 {start}"
+        exit 1
+esac
+

@@ -1,0 +1,51 @@
+#!/bin/sh
+PATH=$PATH:/usr/local/bin:/usr/local/sbin:/home/root/sbin
+stty -echo < /dev/console
+echo 1 > /proc/sys/vm/dirty_ratio
+echo 250 > /proc/sys/vm/dirty_writeback_centisecs
+echo 1500 > /proc/sys/vm/dirty_expire_centisecs
+echo 8192 > /proc/sys/vm/min_free_kbytes
+
+# Run preset scripts
+echo ""
+echo "###preS.d start###"
+if test -d /etc/preS.d/; then
+	for RCS in /etc/preS.d/S*; do
+		if test -r "$RCS"; then
+			. "$RCS" start
+		fi
+	done
+	unset RCS
+fi
+
+echo ""
+echo "###preS.d ended###"
+cat /proc/uptime
+echo "###"
+
+# Run system scripts
+echo ""
+echo "###rcS.d start###"
+if test -d /etc/rcS.d/; then
+	for RCS in /etc/rcS.d/S*; do
+		if test -r "$RCS"; then
+			. "$RCS" start
+		fi
+	done
+	unset RCS
+fi
+
+echo ""
+echo "###rcS.d ended###"
+cat /proc/uptime
+echo "###"
+
+# Run application scripts
+if test -d /dvb/etc/rcS.d/; then
+	for RCS in /dvb/etc/rcS.d/S*; do
+		if test -r "$RCS"; then
+			. "$RCS" start
+		fi
+	done
+	unset RCS
+fi

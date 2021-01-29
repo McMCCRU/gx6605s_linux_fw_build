@@ -1,0 +1,44 @@
+#!/bin/sh
+
+if [ -f /home/gx/etc/config.conf ]; then
+. /home/gx/etc/config.conf
+fi
+
+if [ ! -n "$SATIP_OPT" ]; then
+	SATIP_OPT="-g"
+fi
+
+if [ -n "$2" ] && [ "$2" != "0" ]; then
+	super sched minisatip -q -d $2 /etc/rcS.d/S98minisatip restart
+fi
+
+start() {
+	if [ -x /usr/sbin/minisatip ]; then
+		echo "Start minisatip..."
+		/usr/sbin/minisatip $SATIP_OPT
+	fi
+}
+
+stop() {
+	if [ -x /usr/sbin/minisatip ]; then
+		echo "Stop minisatip..."
+		killall -15 minisatip
+		sleep 2
+	fi
+}
+
+case "$1" in
+	start)
+		start
+	;;
+	stop)
+		stop
+	;;
+	restart|reload)
+		stop
+		start
+	;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac

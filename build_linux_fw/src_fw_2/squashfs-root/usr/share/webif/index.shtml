@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SAT>IP - Settings</title>
+  <link rel="icon"          href="favicon.ico" type="image/vnd.microsoft.icon"/>
+  <link rel="shortcut icon" href="favicon.ico" type="image/vnd.microsoft.icon"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style type="text/css">
+    * { outline: none; }
+    body {
+      background-color: #789; margin: 0;
+      padding: 0; font: 16px/1.4 Helvetica, Arial, sans-serif;
+      font: 16px/1.4 Helvetica, Arial, sans-serif;
+    }
+    div.content {
+      width: 800px; margin: 2em auto; padding: 20px 50px;
+      background-color: #fff; border-radius: 1em;
+    }
+    code { background: #eee; padding: 0 0.3em; border-radius: 0.2em; }
+    label { display: inline-block; min-width: 5em;}
+    .label1 { float: right; margin-right: 3em;}
+    input[type="text"] { border: 1px solid #ccc; padding: 0.2em; margin-right: 2em; width: 400px; }
+    input[type="text2"] { border: 1px solid #ccc; padding: 0.2em; margin-right: 2em; width: 110px; }
+    input[type="text3"] { border: 1px solid #ccc; padding: 0.2em; margin-right: 2em; width: 100px; }
+    input[type="text4"] { border: 1px solid #ccc; padding: 0.2em; margin-right: 2em; width: 200px; }
+    input[type="text5"] { border: 1px solid #ccc; padding: 0.2em; margin-right: 0.5em; width: 20px; }
+    a:link, a:visited { color: #69c; text-decoration: none; }
+    @media (max-width: 900px) {
+      div.content { width: auto; margin: 2em; padding: 1em; }
+    }
+    fieldset { border: 1px solid #ccc; padding: 1em; }
+    #result {
+      background: #cfc; border: 1px solid #ccc; padding: 2px 1em;
+      white-space: pre-wrap; font-size: 85%; display: none; text-align: center;
+    }
+
+    .splash {
+      position:absolute;
+      top:50%;
+      left:0;
+      right:0;
+      margin: auto;
+    }
+
+    .splash img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      height: 100px;
+      width: 100px;
+    }
+
+    .card {
+      background-color: #f7f7f7;
+      padding: 20px 25px 15px;
+      margin: 0 auto 25px;
+      width: 380px;
+      -moz-border-radius: 6px;
+      -webkit-border-radius: 6px;
+      border-radius: 6px;
+      -moz-box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.6);
+      -webkit-box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.6);
+      box-shadow: 0px 6px 6px rgba(0, 0, 0, 0.6);
+   }
+
+   .spinner-icon {
+      position: absolute;
+      right: 20px;
+   }
+
+   #updform {
+      display:none;
+   }
+
+   #is_dvbt1 {
+      display:<!--#call is_dvbt -->;
+   }
+
+   #is_dvbt2 {
+      display:<!--#call is_dvbt -->;
+   }
+</style>
+<link href="nprogress.css" rel="stylesheet" />
+<script src="jquery-1.11.3.min.js"></script>
+<script src="nprogress.js"></script>
+<script language="javascript" type="text/javascript">
+    var splashHtml = '<div class="splash card">' +
+        '<div role="spinner">' +
+        '<div class="spinner-icon"></div>' +
+        '</div>' +
+        '<img class="img-circle" src="satip.jpg"> </img>' +
+        '<p class="lead" style="text-align:center">Please wait...</p>' +
+        '<div role="bar">' +
+        '</div>' +
+        '</div>';
+
+    NProgress.configure({
+      template: splashHtml
+    });
+
+    function rebootTime() {
+       NProgress.start();
+       setInterval(function() {
+          location.reload();
+       }, 20000);
+    }
+
+    function update_form() {
+       $("#updform").toggle();
+    }
+
+    function blockBtnFm() {
+       $('#update_out').prop('disabled', true);
+       $('#restart_satip').prop('disabled', true);
+       $('#reboot').prop('disabled', true);
+       $('#reset').prop('disabled', true);
+       $('#save').prop('disabled', true);
+       $('#upload').prop('disabled', true);
+       $('#filename').prop('disabled', true);
+       $('#file').prop('disabled', true);
+       $('#a1').prop('disabled', true);
+       $('#a2').prop('disabled', true);
+       $('#a3').prop('disabled', true);
+       $('#a4').prop('disabled', true);
+       $('#a5').prop('disabled', true);
+       $('#a6').prop('disabled', true);
+       $('#a7').prop('disabled', true);
+       $('#a8').prop('disabled', true);
+       $('#a9').prop('disabled', true);
+       $('#a10').prop('disabled', true);
+       $('#a11').prop('disabled', true);
+       $('#a12').prop('disabled', true);
+       $('#a13').prop('disabled', true);
+       $('#a14').prop('disabled', true);
+       $('#a15').prop('disabled', true);
+    }
+
+    function updateProgress(evt) {
+      if (evt.lengthComputable) {
+        document.getElementById("output").textContent =
+              "Uploaded " + evt.loaded + " of " + evt.total + " bytes";
+      }
+    }
+
+    function uploadFile() {
+      var file_data = new FormData(document.getElementById('filename'));
+      $.ajax({
+        url: "/upload",
+        type: "POST",
+        data: file_data,
+        processData: false,
+        contentType: false,
+        cache: false,
+        xhr: function() {
+          myXhr = $.ajaxSettings.xhr();
+          if(myXhr.upload){
+            myXhr.upload.addEventListener('progress',updateProgress, false); // for handling the progress of the upload
+          }
+          return myXhr;
+        },
+      }).done(function(data) {
+          document.getElementById("output").textContent = data;
+          if(data.indexOf('uploaded') > 0)
+             update_form();
+      });
+      return false;
+    }
+
+  jQuery(function() {
+
+    $(document).on('submit', '#settings_form', function() {
+      var data = {};
+      $('#settings_form [name]').each(function(index, el) {
+        if ($(el).attr('type') == 'checkbox' && !$(el).is(':checked')) return;
+        data[$(el).attr('name')] = $(el).val();
+      });
+      $('#result').text('');
+      $.ajax({
+        url: '/save',
+        method: 'POST',
+        dataType: 'html',
+        data: data,
+        success: function(data) {
+          $('#result').text('Saved').show().fadeOut(2000);
+        }
+      });
+      return false;
+    });
+
+    $('#reset').click(function() {
+      var data = {};
+      $('#settings_form [name]').each(function(index, el) {
+        data[$(el).attr('name')] = $(el).val();
+      });
+      $('#result').text('');
+      $.ajax({
+        url: '/reset',
+        method: 'POST',
+        dataType: 'html',
+        data: data,
+        success: function(data) {
+          $('#result').text('Reset').show().fadeOut(2000);
+          location.reload();
+        }
+      });
+      return false;
+    });
+
+    $('#reboot').click(function() {
+      var data = {};
+      $('#settings_form [name]').each(function(index, el) {
+        data[$(el).attr('name')] = $(el).val();
+      });
+      $('#result').text('');
+      $.ajax({
+        url: '/reboot',
+        method: 'POST',
+        dataType: 'html',
+        data: data,
+        success: function(data) {
+          $('#result').text('Reboot').show().fadeOut(2000);
+          blockBtnFm();
+          rebootTime();
+        }
+      });
+      return false;
+    });
+
+     $('#update_out').click(function() {
+       blockBtnFm();
+       setInterval(function() {
+        $.ajax({
+          url: '/update',
+          method: 'POST',
+          dataType: 'json',
+          success: function(json) {
+            $('#upresult').text(json.upresult);
+            if(json.upresult.indexOf('Reboot') == 0) {
+               rebootTime();
+               form.reload();
+            }
+            if(json.upresult.indexOf('Problem') == 0) {
+               rebootTime();
+               form.reload();
+            }
+          }
+        });
+        }, 1000);
+      });
+
+   $('#restart_satip').click(function() {
+      var data = {};
+      $('#settings_form [name]').each(function(index, el) {
+        data[$(el).attr('name')] = $(el).val();
+      });
+      $('#result').text('');
+      $.ajax({
+        url: '/restart_satip',
+        method: 'POST',
+        dataType: 'html',
+        data: data,
+        success: function(data) {
+          $('#result').text('Restart minisatip').show().fadeOut(2000);
+        }
+      });
+      return false;
+    });
+
+   $(document).ready(function() {
+     setInterval(function() {
+     $.ajax({
+       url: '/info',
+       dataType: 'json',
+       success: function(json) {
+         $('#cpu_usage').text(json.cpu_usage + '% ');
+         $('#version').text(json.version);
+         $('#ctime').text(json.ctime);
+         $('#mem_free').text(json.mem_free + 'kB /');
+         $('#mem_total').text(json.mem_total + 'kB');
+       }
+     });
+     }, 1000);
+   });
+
+  });
+</script>
+</head>
+<body>
+  <div class="content">
+    <a href="http://<!--#call LOCAL_IP -->:8080" title="Minisatip status page" target="_blank"><img src="satip.png" style="float:right; height: 100px; border-radius: 3px;"></a>
+    <h1><center>SAT>IP Configurator</center></h1>
+    <br>
+    <fieldset>
+      <legend>Sysinfo</legend>
+      <table border="0" width=480>
+      <tr><td><label>Version FW:</label></td> <td><span id="version">&nbsp;</span></td></tr>
+      <tr><td><label>Current time:</label></td> <td><span id="ctime">&nbsp;</span></td></tr>
+      <tr><td><label>CPU usage:</label></td> <td><span id="cpu_usage">&nbsp;</span></td></tr>
+      <tr><td><label>MEM (free/total):</label></td> <td><span id="mem_free">&nbsp;</span> <span id="mem_total">&nbsp;</span></td></tr>
+      </table>
+    </fieldset>
+    <br>
+    <fieldset>
+      <legend>Update Firmware</legend>
+      <label>Select a file:</label><br>
+      <form method="POST" id="filename" name="filename" onsubmit="return uploadFile();">
+        <input type="file" id="file" name="file" required />
+        <input type="submit" value="Upload" id="upload" />
+        <br><div id="output"></div>
+      </form>
+      <form method="POST" id="updform">
+        <button type="button" id="update_out">Update</button>
+        <br><div id="upresult"></div>
+      </form>
+    </fieldset>
+    <br>
+    <form method="POST" id="settings_form">
+    <fieldset>
+      <legend>Device settings</legend>
+    <table border="0" width=680>
+    <tr><td>
+      <label>Minisatip options:</label></td> <td><input type="text"
+        name="SATIP_OPT" value="<!--#call SATIP_OPT -->" id="a1" ></td><td><button type="button" id="restart_satip">Restart</button>
+    </td></tr>
+    <tr><td>
+      <label>Minisatip auto restart:</label></td> <td><input type="text5"
+        name="SATIP_RESTART" value="<!--#call SATIP_RESTART -->" id="a13" >sec.
+    </td></tr>
+    <tr><td>
+      <label>Frontend init string:</label></td> <td><input type="text"
+        name="FE_PROFILE" value="<!--#call FE_PROFILE -->" id="a2" >
+    </td></tr>
+    <tr><td>
+      <label>MAC Address:</label></td> <td><input type="text2"
+        name="HW_ADDR" value="<!--#call HW_ADDR -->" id="a3" ><label class="label1">Ethernet promisc mode:</label></td><td><input type="checkbox"
+        name="EN_ETH_PROMISC" value="yes" id="a15" <!--#call EN_ETH_PROMISC --> >
+    </td></tr>
+    <tr><td>
+      <label>IP Address:</label></td> <td><input type="text3"
+        name="LOCAL_IP" value="<!--#call LOCAL_IP -->" id="a4" >
+    </td></tr>
+    <tr><td>
+      <label>Netmask IP:</label></td> <td><input type="text3"
+        name="NET_MASK" value="<!--#call NET_MASK -->" id="a5" >
+    </td></tr>
+    <tr><td>
+      <label>Gateway IP:</label></td> <td><input type="text3"
+        name="ROUTE_IP" value="<!--#call ROUTE_IP -->" id="a6" >
+    </td></tr>
+    <tr><td>
+      <label>DNS1 IP:</label></td> <td><input type="text3"
+        name="DNS1" value="<!--#call DNS1 -->" id="a7" >
+    </td></tr>
+    <tr><td>
+      <label>DNS2 IP:</label></td> <td><input type="text3"
+        name="DNS2" value="<!--#call DNS2 -->" id="a8" >
+    </td></tr>
+    <tr><td>
+      <label>DNS3 IP:</label></td> <td><input type="text3"
+        name="DNS3" value="<!--#call DNS3 -->" id="a9" >
+    </td></tr>
+    <tr><td>
+      <label>Time Zone string:</label></td> <td><input type="text"
+        name="TIMEZONE" value="<!--#call TIMEZONE -->" id="a10" >
+    </td></tr>
+    <tr><td>
+      <label>NTP Server:</label></td> <td><input type="text"
+        name="NTP_SERVER" value="<!--#call NTP_SERVER -->" id="a11" >
+    </td></tr>
+    <tr><td>
+      <label>Admin password:</label></td> <td><input type="text4"
+        name="PASS_ADMIN" value="<!--#call PASS_ADMIN -->" id="a12" >
+    </td></tr>
+    <tr><td>
+    <div id="is_dvbt1">
+      <label>ANT. Power ON:</label></div></td> <td><div id="is_dvbt2"><input type="checkbox"
+        name="EN_ANT_PWR" value="on" id="a14" <!--#call EN_ANT_PWR --> ></div>
+    </td></tr>
+    </table>
+    <div style="margin: 1em 0;">
+     <button type="submit" id="save">Save</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" id="reset">Reset</button>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" id="reboot">Reboot</button>
+    </div>
+     <div id="result">&nbsp;</div>
+    </fieldset>
+    </form>
+  </div>
+</body>
+</html>

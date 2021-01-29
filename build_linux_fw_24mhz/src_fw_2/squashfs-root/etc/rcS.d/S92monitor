@@ -1,0 +1,32 @@
+#!/bin/sh
+
+if [ -f /home/gx/etc/config.conf ]; then
+. /home/gx/etc/config.conf
+fi
+
+case "$1" in
+    start)
+        if [ ! -c /dev/monitor0 ]; then
+		echo "Install  monitor driver..."
+		mknod /dev/monitor0 c 10 253
+		insmod /lib/modules/`uname -r`/monitor_memory.ko
+		demod_test
+		if [ "$EN_ANT_PWR" = "on" ]; then
+			monitor -w 0x0030a13c -v 0x7a0
+			monitor -w 0x00305000 -v 0x7a0
+			monitor -w 0x00305004 -v 0x6a0
+		else
+			monitor -w 0x0030a13c -v 0x7a0
+			monitor -w 0x00305000 -v 0x7a0
+			monitor -w 0x00305004 -v 0xa0
+		fi
+        fi
+        ;;
+    stop)
+        ;;
+    restart|reload)
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac

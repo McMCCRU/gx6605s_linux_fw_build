@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# Start application ...
+#
+
+case "$1" in
+    start)
+        DATA="/dev/mtdblock"`cat /proc/mtd | busybox grep -i data | cut -c4`
+        mount -t minifs $DATA /home/gx
+        if [ ! -d /home/gx/etc ]; then
+            mkdir -p /home/gx/etc
+        fi
+        ;;
+    stop)
+        ;;
+    restart|reload)
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac

@@ -1,0 +1,21 @@
+# Ash profile
+# vim: syntax=sh
+
+# No core files by default
+ulimit -S -c 0 > /dev/null 2>&1
+
+USER="`id -un`"
+LOGNAME=$USER
+PS1='[\u@\h \W]\# '
+PATH=$PATH:/usr/local/bin
+PATH=$PATH:/usr/local/sbin
+
+hostname -F /etc/hostname
+HOSTNAME=`hostname`
+
+
+export USER LOGNAME PS1 PATH HOSTNAME
+
+
+alias ls='ls --color=auto'
+alias ll='ls -l'

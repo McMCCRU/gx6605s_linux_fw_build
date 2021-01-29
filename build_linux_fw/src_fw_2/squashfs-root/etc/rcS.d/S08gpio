@@ -1,0 +1,9 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		echo "gpio..."
+		mknod /dev/gxgpio c 23 0
+		insmod /lib/modules/`uname -r`/gpio.ko
+	;;
+esac
